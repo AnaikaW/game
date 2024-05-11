@@ -5,6 +5,74 @@ let score = 0;
 
 let enemiesKilled = 0;
 
+// Pseudo code for toggling full screen
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+// Add this toggle function to a button or a key event
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+document.getElementById('fullscreenBtn').addEventListener('click', toggleFullScreen);
+
+
+function initializeGame() {
+    const player = document.getElementById('player');
+    player.style.left = '50px'; // Start somewhat away from the edge
+    player.style.top = '100px'; // Start somewhat away from the edge
+}
+
+window.onload = function() {
+    const player = document.getElementById('player');
+    // Set initial position within the window bounds
+    player.style.left = '50px';  // Not too close to the edge
+    player.style.top = '50px';   // Not too close to the edge
+};
+
+
+window.addEventListener('resize', function() {
+    adjustPlayerPosition();
+});
+
+function adjustPlayerPosition() {
+    const player = document.getElementById('player');
+    player.style.left = `${Math.min(parseInt(player.style.left, 10), window.innerWidth - player.offsetWidth)}px`;
+    player.style.top = `${Math.min(parseInt(player.style.top, 10), window.innerHeight - player.offsetHeight)}px`;
+}
+
+
+function adjustPlayerPosition() {
+    const player = document.getElementById('player');
+    // Ensure the player doesn't go out of bounds if the window is resized
+    player.style.left = `${Math.min(parseInt(player.style.left, 10), window.innerWidth - player.offsetWidth)}px`;
+    player.style.top = `${Math.min(parseInt(player.style.top, 10), window.innerHeight - player.offsetHeight)}px`;
+}
+
+function adjustEnemies() {
+    const enemies = document.querySelectorAll('.enemy');
+    // Recalculate positions or properties related to enemies if necessary
+    enemies.forEach(enemy => {
+        enemy.style.left = `${Math.min(parseInt(enemy.style.left, 10), window.innerWidth - enemy.offsetWidth)}px`;
+    });
+}
+
+
 function checkCollision() {
     let bullets = document.querySelectorAll('.bullet');
     let enemies = document.querySelectorAll('.enemy');
@@ -52,21 +120,25 @@ function updateScore() {
 
 function movePlayer(event) {
     const player = document.getElementById('player');
-    const gameArea = document.getElementById('gameArea');
-    const step = 10; // change in pixels per move
-    let playerPosition = player.getBoundingClientRect();
+    const step = 10;  // Pixels to move per keypress
+    let currentLeft = parseInt(player.style.left, 10) || 0;
+    let currentTop = parseInt(player.style.top, 10) || 0;
 
-    if (event.key === 'ArrowUp' && playerPosition.top > gameArea.offsetTop) {
-        player.style.top = `${playerPosition.top - step}px`;
-    } else if (event.key === 'ArrowDown' && playerPosition.bottom < gameArea.offsetHeight) {
-        player.style.top = `${playerPosition.top + step}px`;
-    } else if (event.key === 'ArrowLeft' && playerPosition.left > gameArea.offsetLeft) {
-        player.style.left = `${playerPosition.left - step}px`;
-    } else if (event.key === 'ArrowRight' && playerPosition.right < gameArea.offsetWidth) {
-        player.style.left = `${playerPosition.left + step}px`;
+    switch (event.key) {
+        case 'ArrowUp':
+            player.style.top = `${Math.max(0, currentTop - step)}px`;
+            break;
+        case 'ArrowDown':
+            player.style.top = `${Math.min(window.innerHeight - player.offsetHeight, currentTop + step)}px`;
+            break;
+        case 'ArrowLeft':
+            player.style.left = `${Math.max(0, currentLeft - step)}px`;
+            break;
+        case 'ArrowRight':
+            player.style.left = `${Math.min(window.innerWidth - player.offsetWidth, currentLeft + step)}px`;
+            break;
     }
 }
-
 
 function shoot(powerful = false) {
     var audio = new Audio("data/pop.wav");
@@ -101,8 +173,10 @@ function createEnemy() {
     const gameArea = document.getElementById('gameArea');
     let enemy = document.createElement('div');
     enemy.className = 'enemy';
-    enemy.style.left = '800px'; // Start from the right edge of the game area
-    enemy.style.top = `${Math.floor(Math.random() * 550)}px`; // Random position within the game area
+    // Set initial position to the right edge of the game area
+    enemy.style.left = `${gameArea.offsetWidth}px`;  // Use offsetWidth of gameArea
+    enemy.style.top = `${Math.floor(Math.random() * (gameArea.offsetHeight - 50))}px`;  // Ensure the enemy is fully within the vertical bounds
+
     enemy.setAttribute('data-hit', '0'); // Track hits on the enemy
     gameArea.appendChild(enemy);
 
@@ -113,7 +187,7 @@ function createEnemy() {
             clearInterval(interval);
             gameArea.removeChild(enemy);
         }
-    }, 70); //speed
+    }, 70); // Speed
 }
 
 
@@ -148,17 +222,16 @@ document.addEventListener('keyup', function(event) {
 function updatePlayerPosition() {
     const player = document.getElementById('player');
     const step = 5; // Smaller step for smoother motion
-    let top = parseInt(player.style.top);
-    let left = parseInt(player.style.left);
+    let top = parseInt(player.style.top) || 0;
+    let left = parseInt(player.style.left) || 0;
 
-    if (keys.ArrowUp) top -= step;
-    if (keys.ArrowDown) top += step;
-    if (keys.ArrowLeft) left -= step;
-    if (keys.ArrowRight) left += step;
+    if (keys.ArrowUp && top > 0) top -= step;
+    if (keys.ArrowDown && top < window.innerHeight - player.offsetHeight) top += step;
+    if (keys.ArrowLeft && left > 0) left -= step;
+    if (keys.ArrowRight && left < window.innerWidth - player.offsetWidth) left += step;
 
-    // Boundary checks
-    player.style.top = `${Math.max(0, Math.min(top, 550))}px`; // 600px - 50px (player height)
-    player.style.left = `${Math.max(0, Math.min(left, 750))}px`; // 800px - 50px (player width)
+    player.style.top = `${top}px`;
+    player.style.left = `${left}px`;
 }
 
 setInterval(updatePlayerPosition, 20); // Update position every 20 ms

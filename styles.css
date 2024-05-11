@@ -1,20 +1,38 @@
-#gameArea {
-    width: 800px;
-    height: 600px;
-    border: 1px solid black;
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;  
+    width: 100%;
+    height: 100%;
     position: relative;
-    overflow: hidden;
+}
+
+#gameArea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;  
+    height: 100vh;  
     background-color: #f0f0f0;
 }
 
+#fullscreenBtn {
+    position: fixed; /* or absolute, depending on layout */
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    z-index: 1001; /* Make sure it is above other elements */
+}
+
+
 #player {
+    position: absolute;
     width: 50px;
     height: 50px;
     background-color: blue;
-    position: absolute;
-    left: 375px; /* Center the player initially */
-    top: 275px;
 }
+
+
 
 .bullet {
     width: 10px;
@@ -32,10 +50,10 @@
 }
 
 .enemy {
-    width: 50px;
+    position: absolute;  /* Make sure this is consistent with your JS positioning logic */
+    width: 50px;  /* Match this with your JS settings */
     height: 50px;
-    background-color: green;
-    position: absolute;
+    background-color: green;  /* Or any other styling you prefer */
 }
 
 #gameOverScreen {
