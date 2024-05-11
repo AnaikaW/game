@@ -1,0 +1,65 @@
+#gameArea {
+    width: 800px;
+    height: 600px;
+    border: 1px solid black;
+    position: relative;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+#player {
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    position: absolute;
+    left: 375px; /* Center the player initially */
+    top: 275px;
+}
+
+.bullet {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    position: absolute;
+    border-radius: 50%;
+}
+.powerBullet { 
+    width: 10px;
+    height: 10px;
+    background-color: gold; 
+    position: absolute;
+    border-radius: 50%;
+}
+
+.enemy {
+    width: 50px;
+    height: 50px;
+    background-color: green;
+    position: absolute;
+}
+
+#gameOverScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    text-align: center;
+    padding-top: 20vh;  
+    display: none;
+    z-index: 1000; 
+}
+
+#gameOverScreen h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+#gameOverScreen button {
+    padding: 10px 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
